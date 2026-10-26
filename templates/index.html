@@ -1,0 +1,246 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Air Quality Monitoring Dashboard</title>
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">AQ</div>
+            <div>
+                <h2>AirSense</h2>
+                <p>Monitoring System</p>
+            </div>
+        </div>
+
+        <nav>
+            <a class="nav-link active" href="#overview">Dashboard</a>
+            <a class="nav-link" href="#predict">Cluster Prediction</a>
+            <a class="nav-link" href="#result">Results</a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <span class="status-dot"></span>
+            Model ready
+            <p>K-Means · 3 clusters</p>
+        </div>
+    </aside>
+
+    <main class="main-content" id="overview">
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">ENVIRONMENTAL INTELLIGENCE</p>
+                <h1>Air Quality Dashboard</h1>
+                <p class="subtitle">
+                    Analyze monitoring station conditions using machine learning.
+                </p>
+            </div>
+            <div class="model-badge">● Model connected</div>
+        </header>
+
+        <section class="stats-grid">
+            <article class="stat-card">
+                <span class="stat-icon purple">PM</span>
+                <p>PM2.5</p>
+                <h2 id="stat-pm25">85</h2>
+                <span class="unit">µg/m³ · Sample</span>
+            </article>
+            <article class="stat-card">
+                <span class="stat-icon blue">P10</span>
+                <p>PM10</p>
+                <h2 id="stat-pm10">130</h2>
+                <span class="unit">µg/m³ · Sample</span>
+            </article>
+            <article class="stat-card">
+                <span class="stat-icon orange">N</span>
+                <p>NO₂</p>
+                <h2 id="stat-no2">60</h2>
+                <span class="unit">µg/m³ · Sample</span>
+            </article>
+            <article class="stat-card">
+                <span class="stat-icon green">W</span>
+                <p>Wind speed</p>
+                <h2 id="stat-wind">9</h2>
+                <span class="unit">km/h · Sample</span>
+            </article>
+        </section>
+
+        <section class="content-grid">
+            <article class="panel input-panel" id="predict">
+                <div class="panel-heading">
+                    <div>
+                        <p class="eyebrow">STATION INPUT</p>
+                        <h2>Analyze a monitoring station</h2>
+                    </div>
+                    <span class="step-badge">6 FEATURES</span>
+                </div>
+
+                <p class="helper">
+                    Enter the six measurements used when training the model.
+                </p>
+
+                <form id="prediction-form">
+                    <div class="form-grid">
+                        <label>
+                            PM2.5
+                            <span class="field-unit">µg/m³</span>
+                            <input type="number" name="pm25"
+                                   min="0" max="1000" step="any"
+                                   value="85" required>
+                        </label>
+
+                        <label>
+                            PM10
+                            <span class="field-unit">µg/m³</span>
+                            <input type="number" name="pm10"
+                                   min="0" max="1000" step="any"
+                                   value="130" required>
+                        </label>
+
+                        <label>
+                            Nitrogen dioxide (NO₂)
+                            <span class="field-unit">µg/m³</span>
+                            <input type="number" name="no2"
+                                   min="0" max="1000" step="any"
+                                   value="60" required>
+                        </label>
+
+                        <label>
+                            Ozone
+                            <span class="field-unit">µg/m³</span>
+                            <input type="number" name="ozone"
+                                   min="0" max="1000" step="any"
+                                   value="28" required>
+                        </label>
+
+                        <label>
+                            Humidity
+                            <span class="field-unit">%</span>
+                            <input type="number" name="humidity_pct"
+                                   min="0" max="100" step="any"
+                                   value="58" required>
+                        </label>
+
+                        <label>
+                            Wind speed
+                            <span class="field-unit">km/h</span>
+                            <input type="number" name="wind_kph"
+                                   min="0" max="300" step="any"
+                                   value="9" required>
+                        </label>
+                    </div>
+
+                    <div class="button-row">
+                        <button type="button" id="reset-btn" class="secondary-btn">
+                            Reset values
+                        </button>
+                        <button type="submit" id="predict-btn" class="primary-btn">
+                            Predict Cluster <span>→</span>
+                        </button>
+                    </div>
+                </form>
+                <p id="error-message" class="error-message" role="alert"></p>
+            </article>
+
+            <article class="panel result-panel" id="result">
+                <p class="eyebrow">MACHINE LEARNING OUTPUT</p>
+                <h2>Prediction Result</h2>
+
+                <div id="result-placeholder" class="result-placeholder">
+                    <div class="placeholder-icon">✳</div>
+                    <p>Ready to analyze</p>
+                    <span>Submit the measurements to see the predicted cluster.</span>
+                </div>
+
+                <div id="result-content" hidden>
+                    <div class="cluster-circle" id="cluster-circle">
+                        <span>CLUSTER</span>
+                        <strong id="cluster-number">0</strong>
+                    </div>
+                    <h3 id="cluster-name"></h3>
+                    <p id="cluster-description" class="result-description"></p>
+                    <div class="result-note">
+                        <strong>Interpretation</strong>
+                        <p>
+                            This group is based on similarities in pollutant
+                            levels and weather conditions. It is not an official
+                            health-risk or AQI classification.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="model-footer">
+                    <span>●</span> Trained K-Means model · k = 3
+                </div>
+            </article>
+        </section>
+
+        <section class="panel cluster-panel">
+            <div class="panel-heading">
+                <div>
+                    <p class="eyebrow">CLUSTER OVERVIEW</p>
+                    <h2>Discovered station profiles</h2>
+                </div>
+            </div>
+
+            <div class="cluster-grid">
+                <article class="cluster-card cluster-high">
+                    <div class="cluster-top">
+                        <span class="cluster-tag">Cluster 0</span>
+                        <span class="cluster-symbol">01</span>
+                    </div>
+                    <h3>High pollution pattern</h3>
+                    <p>Higher particulate matter and NO₂, with lower wind speeds.</p>
+                    <div class="mini-metrics">
+                        <span>PM2.5 <b>87.04</b></span>
+                        <span>PM10 <b>131.59</b></span>
+                        <span>NO₂ <b>57.86</b></span>
+                    </div>
+                </article>
+
+                <article class="cluster-card cluster-clean">
+                    <div class="cluster-top">
+                        <span class="cluster-tag">Cluster 1</span>
+                        <span class="cluster-symbol">02</span>
+                    </div>
+                    <h3>Cleaner / windy pattern</h3>
+                    <p>Lower pollutants, higher humidity and stronger winds.</p>
+                    <div class="mini-metrics">
+                        <span>PM2.5 <b>18.18</b></span>
+                        <span>PM10 <b>30.87</b></span>
+                        <span>NO₂ <b>12.96</b></span>
+                    </div>
+                </article>
+
+                <article class="cluster-card cluster-moderate">
+                    <div class="cluster-top">
+                        <span class="cluster-tag">Cluster 2</span>
+                        <span class="cluster-symbol">03</span>
+                    </div>
+                    <h3>Moderate pollution pattern</h3>
+                    <p>Intermediate particulate matter, NO₂ and wind conditions.</p>
+                    <div class="mini-metrics">
+                        <span>PM2.5 <b>32.70</b></span>
+                        <span>PM10 <b>56.61</b></span>
+                        <span>NO₂ <b>24.31</b></span>
+                    </div>
+                </article>
+            </div>
+            <p class="footnote">
+                Values are the cluster means from the demo dataset, in the
+                corresponding feature units. Cluster descriptions are indicative.
+            </p>
+        </section>
+
+        <footer>
+            AirSense · Air Quality Monitoring & Clustering · K-Means
+        </footer>
+    </main>
+</body>
+</html>
